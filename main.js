@@ -63,13 +63,14 @@ const THREE_PHASE_VOLTAGE = 320
 const THREE_PHASE_FACTOR = (Math.sqrt(3) * THREE_PHASE_VOLTAGE)
 
 const convertKiloWattsToAmps = (kiloWatts, phase = "SINGLE_PHASE") => {
-  const POWER = (kiloWatts * 1000)
+  const POWER = (kiloWatts * 1000); // converting kiloWatts to Watts
 
   if (phase === "THREE_PHASE") {
-    return roundNumberToTwoDecimals((POWER / THREE_PHASE_FACTOR))
+    return roundNumberToTwoDecimals((POWER / (Math.sqrt(3) * THREE_PHASE_VOLTAGE)));
   }
 
-  return roundNumberToTwoDecimals((POWER / SINGLE_PHASE_VOLTAGE))
+  // Default to single phase calculation
+  return roundNumberToTwoDecimals((POWER / SINGLE_PHASE_VOLTAGE));
 }
 
 const convertAmpsToKiloWatts = (amps, phase = "SINGLE_PHASE") => {
