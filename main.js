@@ -1,6 +1,6 @@
 // Reuse of common methods that allow access to the DOM
-const $ = (selector) => document.querySelector(selector)
-const $All = (selector) => document.querySelectorAll(selector)
+const $ = (selector) => document.querySelector(selector);
+const $All = (selector) => document.querySelectorAll(selector);
 
 // Utility methods
 const roundNumberToTwoDecimals = (value) => {
@@ -165,58 +165,51 @@ lengthCableFeetField.addEventListener('focusout', handleFocusOutsideFeetToMeeter
 
 // Cable sizing calculation logic
 async function calculate(data) {
-  const { amps, kiloWatts, lengthCableFeet, lengthCableMeter, methodInstallation, phase, voltageDrop } = data
-  const containerResults = $('.container_results')
+  const { amps, kiloWatts, lengthCableFeet, lengthCableMeter, methodInstallation, phase, voltageDrop } = data;
+  const containerResults = $('.container_results');
 
-  containerResults.innerHTML = ''
+  containerResults.innerHTML = '';
 
   try {
-    const results = document.createElement('div')
-    results.setAttribute('id', 'results')
-    containerResults.appendChild(results)
-    location.hash = '#results'
+    const results = document.createElement('div');
+    results.setAttribute('id', 'results');
+    containerResults.appendChild(results);
 
     const cables = await calculateCableSize(formattingPhase(phase).toLowerCase(), Number(voltageDrop), Number(amps), Number(lengthCableMeter), methodInstallation);
 
-    let resultHTML = '';
+    // Generate and insert navigation buttons
+    const navigationButtonsHTML = generateNavigationButtons(cables);
+    const navContainer = document.getElementById('navigation-container');
+    navContainer.innerHTML = navigationButtonsHTML;
 
-    for (let cable of cables) {
+    let resultHTML = '';
+    for (let i = 0; i < cables.length; i++) {
+      let cable = cables[i];
 
       if (cable.message) {
-        const { short_title, sub_title, message } = cable
-        resultHTML += renderCalculateMessage(short_title, sub_title, message)
+        const { short_title, sub_title, message } = cable;
+        resultHTML += renderCalculateMessage(short_title, sub_title, message);
       } else {
-        const { shortTitle, sub_title, cableSize, methodInstallation, voltage } = cable
-        resultHTML += renderResults(shortTitle, sub_title, voltage, kiloWatts, amps, lengthCableMeter, lengthCableFeet, methodInstallation, cableSize)
+        const { shortTitle, sub_title, cableSize, methodInstallation, voltage } = cable;
+        // Add the ID to the renderResults call
+        resultHTML += renderResults(shortTitle, sub_title, voltage, kiloWatts, amps, lengthCableMeter, lengthCableFeet, methodInstallation, cableSize, 'result_' + i);
       }
     }
 
-    results.innerHTML = renderResult(resultHTML)
-
-
-    const recalculate = () => {
-      location.hash = '#calculator'
-      $('.container_results').innerHTML = ''
-    }
-
-    $('#calculate-again').addEventListener('click', recalculate)
-
+    results.innerHTML = renderResult(resultHTML);
   } catch (err) {
-    containerResults.innerHTML = renderErrorMessageTemplate()
+    containerResults.innerHTML = renderErrorMessageTemplate();
   } finally {
-    isLoading = false
+    isLoading = false;
   }
 }
+
 
 // templates
 function renderResult(results) {
   return `
-  <div class="header_results">
-  <h1>Results</h1>
-    <button id="calculate-again">Calculate Again</button>
-  </div>
 	<div class="cards_container">${results}</div>
-  `
+  `;
 }
 
 function renderLoaderTemplate() {
@@ -247,9 +240,9 @@ function renderCalculateMessage(cableName, tableToApply, message) {
   `
 }
 
-function renderResults(cableName, tableToApply, voltage, kiloWatts, amps, meter, feet, methodInstallation, cableSize) {
+function renderResults(cableName, tableToApply, voltage, kiloWatts, amps, meter, feet, methodInstallation, cableSize, id) {
   return `
-  <article class="card">
+  <article class="card" id="${id}">
 		<h2 class="card_heading">${cableName}</h2>
 		<figure class="card_item">
 			<figcaption class="item_name">Tables Apply to</figcaption>
@@ -279,6 +272,18 @@ function renderResults(cableName, tableToApply, voltage, kiloWatts, amps, meter,
 		</figure>
 	</article>
   `
+}
+
+// New function to generate navigation buttons
+function generateNavigationButtons(cables) {
+  return cables.map((cable, index) => {
+    return `<button class="result-nav-button" onclick="scrollToResult('result_${index}')">${cable.shortTitle}</button>`;
+  }).join('');
+}
+
+// New function for smooth scrolling to result
+function scrollToResult(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
 }
 
 // Data
