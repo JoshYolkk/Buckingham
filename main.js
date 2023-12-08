@@ -287,11 +287,11 @@ function renderResults(cableName, tableToApply, voltage, kiloWatts, amps, meter,
 // New function to generate navigation buttons
 function generateNavigationButtons(cables) {
   return cables.map((cable, index) => {
-    // Check if the shortTitle is not undefined
-    if (typeof cable.shortTitle !== 'undefined') {
+    // Check if the shortTitle is defined and not empty
+    if (cable.shortTitle && cable.shortTitle.trim() !== '') {
       return `<button class="result-nav-button" onclick="scrollToResult('result_${index}')">${cable.shortTitle}</button>`;
     }
-    return ''; // Return an empty string if shortTitle is undefined
+    return ''; // Skip button creation if shortTitle is undefined or empty
   }).join('');
 }
 
