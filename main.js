@@ -55,17 +55,7 @@ const handleOnSubmit = (e) => {
   calculatorForm.reset()
 }
 
-const calculatorForm = $('#calculator-form');
 calculatorForm.addEventListener('submit', handleOnSubmit)
-
-const calculateAgainButton = document.getElementById('calculate-again');
-calculateAgainButton.addEventListener('click', function() {
-    calculatorForm.reset();
-    const containerResults = document.querySelector('.container_results');
-    if (containerResults) {
-        containerResults.innerHTML = '';
-    }
-});
 
 // Methods to convert units of KILOWATTS to AMPS and vice versa
 const SINGLE_PHASE_VOLTAGE = 230
@@ -287,11 +277,7 @@ function renderResults(cableName, tableToApply, voltage, kiloWatts, amps, meter,
 // New function to generate navigation buttons
 function generateNavigationButtons(cables) {
   return cables.map((cable, index) => {
-    // Check if the shortTitle is not undefined
-    if (typeof cable.shortTitle !== 'undefined') {
-      return `<button class="result-nav-button" onclick="scrollToResult('result_${index}')">${cable.shortTitle}</button>`;
-    }
-    return ''; // Return an empty string if shortTitle is undefined
+    return `<button class="result-nav-button" onclick="scrollToResult('result_${index}')">${cable.shortTitle}</button>`;
   }).join('');
 }
 
@@ -685,4 +671,3 @@ async function calculateCableSize(phase, inputVoltageDrop, power, lengthCable, i
 
   return results
 }
-
